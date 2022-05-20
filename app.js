@@ -1,9 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const port = process.env.PORT || 8000; // -- 처음에 할땐 3000이라고 하고 한 후
-//localhost:3000 으로 하시는 것을 추천
-//나중에 80포트를 써야 할 일이 옵니다.
+const port = process.env.PORT || 8000;
 const app = express();
+
+// https://freestrokes.tistory.com/138
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -14,13 +14,67 @@ app.use('/static', express.static('public'));
 
 app.listen(port, () => console.log(`Server up and running on port ${port}.`));
 
+const db = require("./models");
+const res = require('express/lib/response');
+const User = db.User;
+const Board = db.Board;
+
 app.get("/", (req, res) => {
   console.log('---');
   res.json({ message: "Welcome to our application." });
 });
 
+app.get("/board/all", async (req, res) => {
+  const board = await Board.findAll({
+    order: [["createdAt", "DESC"]],
+  })
+  return res.json({board: board});
+})
 
-app.post("/image/get", async (req, res) => {
-	const url = "https://www.ringleplus.com";
-	res.json(url);
-});
+app.post("/board/create", async (req, res) => {
+  const data = req.body;
+  const board = await Board.create({
+    title: data.title,
+    desc: data.desc,
+  })
+  res.json({success: true})
+})
+
+app.get("/board/", async (req, res) => {
+  const id = parseInt(req.query['id']);
+  const board = await Board.findOne({
+    where: {id: id}
+  })
+  return res.json({board: board});
+})
+
+// app.patch("/board/modify", async (req,res)=>{
+//   const data = req.body;
+//   const board = await Board.findOne({
+//     where: {id: data.id}
+//   })
+//   board.title = data.title;
+//   board.desc = data.desc;
+//   await board.save();
+//   return res.json(board);
+// })
+
+app.patch("/board/modify", async (req,res)=>{
+  const data = req.body;
+  const updateboard = await Board.update(data, {
+    where: {id: data.id}
+  })
+  return res.json(updateboard);
+})
+
+app.delete("/board/", async (req, res) => {
+  const id = parseInt(req.query['id']);
+  const board = await Board.destroy({
+    where: {id: id}
+  })
+  return res.json({board: board});
+})
+
+app.post("/board/comment", async (req, res) => {
+  
+})
