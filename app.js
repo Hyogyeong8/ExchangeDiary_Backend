@@ -18,6 +18,7 @@ const db = require("./models");
 const res = require('express/lib/response');
 const User = db.User;
 const Board = db.Board;
+const Comment = db.Comment;
 
 app.get("/", (req, res) => {
   console.log('---');
@@ -45,7 +46,8 @@ app.get("/board/", async (req, res) => {
   const board = await Board.findOne({
     where: {id: id}
   })
-  return res.json({board: board});
+  const comments = await board.getComments();
+  return res.json({board: board, comments: comments});
 })
 
 // app.patch("/board/modify", async (req,res)=>{
@@ -76,5 +78,7 @@ app.delete("/board/", async (req, res) => {
 })
 
 app.post("/board/comment", async (req, res) => {
-  
+  const comment = await Comment.create(req.body);
+  console.log(comment)
+  return res.json({success: true});
 })
