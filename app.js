@@ -82,3 +82,11 @@ app.post("/board/comment", async (req, res) => {
   console.log(comment)
   return res.json({success: true});
 })
+
+app.delete("/board/coment", async (req, res) => {
+  const id = parseInt(req.query['id']);
+  const comment = await Comment.destroy({
+    where: {id: id}
+  })
+  return res.json({board: comment});
+})
