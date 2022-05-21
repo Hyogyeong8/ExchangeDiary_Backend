@@ -74,7 +74,10 @@ app.delete("/board/", async (req, res) => {
   const board = await Board.destroy({
     where: {id: id}
   })
-  return res.json({board: board});
+  const comment = await Comment.destroy({
+    where: {boardId: id}
+  })
+  return res.json({board: board, comment: comment});
 })
 
 app.post("/board/comment", async (req, res) => {
